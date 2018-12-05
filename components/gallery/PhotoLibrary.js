@@ -7,8 +7,7 @@ import {
   Text,
   View,
   ScrollView,
-  CameraRoll,
-  Platform
+  CameraRoll
 } from "react-native";
 import Photo from "./Photo";
 
