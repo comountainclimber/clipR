@@ -37,6 +37,7 @@ export default class CameraView extends React.Component {
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           await CameraRoll.saveToCameraRoll(data.uri);
         } else {
+          // This should probably be a toast notification since it is useless rn.
           this.setState({
             error: true,
             errorMessage: "Permissions not granted to save photos"
