@@ -7,29 +7,46 @@ import {
   Text,
   View,
   ScrollView,
-  CameraRoll
+  CameraRoll,
+  Platform
 } from "react-native";
+import { PermissionsAndroid } from "react-native";
 import Photo from "./Photo";
 
 const window = Dimensions.get("window");
 
 class PhotoLibrary extends Component {
   state = {
-    photos: []
+    photos: [],
+    message: "Loading..."
   };
 
   // TODO: maybe all children should just do this by default HOC???
   async componentDidMount() {
     this.props.shouldRenderBackButton(true, this.props.history);
-    this.setState(await this.accessCameraRoll());
+    if (Platform.OS === "android") {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        this.setState(await this.accessCameraRoll());
+      } else {
+        this.setState({
+          error: true,
+          errorMessage: "Permissions not granted to view photo library"
+        });
+      }
+    } else {
+      this.setState(await this.accessCameraRoll());
+    }
   }
 
   accessCameraRoll = () => {
-    console.log(CameraRoll);
     return CameraRoll.getPhotos({ first: 20 })
       .then(photos =>
         Promise.resolve({
-          photos: photos.edges
+          photos: photos.edges,
+          message: photos.edges.length === 0 && "No pictures found!"
         })
       )
       .catch(e =>
@@ -49,7 +66,11 @@ class PhotoLibrary extends Component {
               <Photo key={photo.node.image.uri} photo={photo} />
             ))
           ) : (
-            <Text> Loading photos... </Text>
+            <Text>
+              {!!this.state.error
+                ? this.state.errorMessage
+                : this.state.message}
+            </Text>
           )}
         </ScrollView>
       </View>
