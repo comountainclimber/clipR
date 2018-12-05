@@ -10,7 +10,6 @@ import {
   CameraRoll,
   Platform
 } from "react-native";
-import { PermissionsAndroid } from "react-native";
 import Photo from "./Photo";
 
 const window = Dimensions.get("window");
