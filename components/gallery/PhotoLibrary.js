@@ -7,7 +7,9 @@ import {
   Text,
   View,
   ScrollView,
-  CameraRoll
+  CameraRoll,
+  Platform,
+  PermissionsAndroid
 } from "react-native";
 import Photo from "./Photo";
 
@@ -22,7 +24,21 @@ class PhotoLibrary extends Component {
   // TODO: maybe all children should just do this by default HOC???
   async componentDidMount() {
     this.props.shouldRenderBackButton(true, this.props.history);
-    this.setState(await this.accessCameraRoll());
+    if (Platform.OS === "android") {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        this.setState(await this.accessCameraRoll());
+      } else {
+        this.setState({
+          error: true,
+          errorMessage: "Permissions not granted to view photo library"
+        });
+      }
+    } else {
+      this.setState(await this.accessCameraRoll());
+    }
   }
 
   accessCameraRoll = () => {
