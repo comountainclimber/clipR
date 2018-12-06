@@ -46,7 +46,7 @@ class PhotoLibrary extends Component {
       .then(photos =>
         Promise.resolve({
           photos: photos.edges,
-          message: photos.edges.length === 0 && "No pictures found!"
+          message: !photos.edges.length && "No pictures found!"
         })
       )
       .catch(e =>
